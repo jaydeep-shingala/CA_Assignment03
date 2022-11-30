@@ -1,11 +1,8 @@
 
 #include <smmintrin.h>
 #include <immintrin.h>
-// Optimize this function
 
 void singleThread(int N, int *matA, int *matB, int *output)
-
-
 {
   assert( N>=4 and N == ( N &~ (N-1)));
   int n = N>>1;
