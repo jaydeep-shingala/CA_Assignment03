@@ -7,7 +7,12 @@
 #include <assert.h>
 using namespace std;
 
+#define TIME_NOW std::chrono::high_resolution_clock::now()
+#define TIME_DIFF(gran, start, end) std::chrono::duration_cast<gran>(end - start).count()
+
+// #include "gpu_thread.h"
 #include "gpu_thread.h"
+
 
 // Used to cross-check answer. DO NOT MODIFY!
 void reference(int N, int *matA, int *matB, int *output)
@@ -61,18 +66,24 @@ int main(int argc, char *argv[])
             input_file >> matB[i * N + j];
     
     // Execute reference program
-    int *output_reference = new int[N*(N>>1)];
-    reference(N, matA, matB, output_reference);
+    int *output_reference = new int[(N>>1)*(N>>1)];
+    auto begin = TIME_NOW;
+    reference(N, matA, matB, output_reference);  //comment by me..
+    auto end = TIME_NOW;
+    cout << "Reference execution time: " << 
+    (double)TIME_DIFF(std::chrono::microseconds, begin, end) / 1000.0 << " ms\n";
     
+
     // Execute gpu version
-    int *output_gpu = new int[N*(N>>1)];
+    int *output_gpu = new int[(N>>1)*(N>>1)];
     gpuThread(N, matA, matB, output_gpu);
-    
-    for(int i = 0; i < N*(N>>1); ++i)
+
+
+    for(int i = 0; i < (N>>1)*(N>>1); ++i)   // comment by me..
         if(output_gpu[i] != output_reference[i]) {
             cout << "Mismatch at " << i << "\n";
             cout << "GPU output: " << output_gpu[i] << ", required output: " << output_reference[i] << "\n";
             exit(0);
-        }
+        }   //..
     input_file.close(); 
 }
