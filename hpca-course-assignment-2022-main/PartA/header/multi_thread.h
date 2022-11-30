@@ -18,8 +18,6 @@ struct arg_struct {
     int *colsadded;
     int j;
 };
-// Create other necessary functions here
-//int rowcounter = 0;
 
 void* rowaddition(void* arguments)
 {
