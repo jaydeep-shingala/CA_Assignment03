@@ -43,16 +43,16 @@ void gpuThread(int N, int *matA, int *matB, int *output)
 {
     size_t bytes = N * N * sizeof(int); //Defining custom size variable 
     // Allocate device memory
-    int *d_a, *d_b, *d_c;
+    int *a, *b, *c;
 
-    cudaMalloc(&d_a, bytes);
-    cudaMalloc(&d_b, bytes);
-    cudaMalloc(&d_c, bytes/4);
+    cudaMalloc(&a, bytes);
+    cudaMalloc(&b, bytes);
+    cudaMalloc(&c, bytes/4);
 
     // Copy data to the device
-    cudaMemcpy(d_a, matA, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, matB, bytes, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_c, output, bytes/4, cudaMemcpyHostToDevice);
+    cudaMemcpy(a, matA, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(b, matB, bytes, cudaMemcpyHostToDevice);
+    cudaMemcpy(c, output, bytes/4, cudaMemcpyHostToDevice);
 
 
     int Threads = tile; // Number of threads in row & column of Thread Block
@@ -65,21 +65,21 @@ void gpuThread(int N, int *matA, int *matB, int *output)
     int kernel = 1;
     switch (kernel){
         case 0:
-            MatrixMul<<<blocks, threads>>>(d_a, d_b ,d_c, N);
+            MatrixMul<<<blocks, threads>>>(a, b ,c, N);
             break;
         
         case 1:
-            MatrixMulTiled<<<blocks, threads>>>(d_a, d_b ,d_c, N);
+            MatrixMulTiled<<<blocks, threads>>>(a, b ,c, N);
             break;
     }
 
 
 
     // Copy results to host
-    cudaMemcpy(output, d_c, bytes/4, cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, c, bytes/4, cudaMemcpyDeviceToHost);
 
     // Free memory on device
-    cudaFree(d_a);
-    cudaFree(d_b);
-    cudaFree(d_c);
+    cudaFree(a);
+    cudaFree(b);
+    cudaFree(c);
 }
